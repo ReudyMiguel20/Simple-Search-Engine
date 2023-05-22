@@ -4,16 +4,19 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 public class DataStorage {
     private ArrayList<String> peopleData;
     private Scanner scanner;
+    private Map<Integer, String> sources;
+    HashMap<String, HashSet<Integer>> index;
 
     public DataStorage() {
         this.scanner = new Scanner(System.in);
         this.peopleData = new ArrayList<>();
+        sources = new HashMap<>();
+        index = new HashMap<>();
     }
 
     public void add(String person) {
@@ -38,9 +41,9 @@ public class DataStorage {
     }
 
     public void searchQuery() {
-            System.out.println("\nEnter a name or email to search all suitable people.");
-            String userInput = scanner.nextLine();
-            searchPeople(userInput);
+        System.out.println("\nEnter a name or email to search all suitable people.");
+        String userInput = scanner.nextLine();
+        searchPeople(userInput);
     }
 
     public void searchPeople(String userInput) {
@@ -48,8 +51,8 @@ public class DataStorage {
         StringBuilder sb = new StringBuilder();
 
         //Iterating the list searching for the inputted data
-        for (String x : this.peopleData) {
-            if (x.toLowerCase().trim().contains(userInput.toLowerCase().trim())) {
+        for (String x : this.index.keySet()) {
+            if (x.toLowerCase().equalsIgnoreCase(userInput.toLowerCase().trim())) {
                 sb.append(x).append("\n");
                 foundData = true;
             }
@@ -101,5 +104,28 @@ public class DataStorage {
             e.printStackTrace();
         }
 
+    }
+
+    public void buildIndex() throws FileNotFoundException {
+        int i = 0;
+
+        try {
+            BufferedReader file = new BufferedReader(new FileReader("names.txt"));
+            String ln;
+            while ((ln = file.readLine()) != null) {
+                String[] words = ln.split("\\W+");
+                for (String word : words) {
+                    word = word.toLowerCase();
+                    if (!index.containsKey(word) || !index.containsValue(i)) {
+                        index.put(word, new HashSet<>());
+                        index.get(word).add(i);
+                    }
+                }
+                i++;
+            }
+            file.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

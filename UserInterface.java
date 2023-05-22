@@ -15,6 +15,7 @@ public class UserInterface {
 
     public void start() throws IOException {
         boolean userWantToExit = false;
+        this.dataStorage.buildIndex();
         this.dataStorage.importFile();
 
         //Implementing the menu inside a while loop
